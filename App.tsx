@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Image, StyleSheet } from 'react-native';
-import HomeScreen from './src/screens/Home'; // Pastikan import sudah benar
+import HomeScreen from './src/screens/Home';
 import AddAnime from './src/screens/AddAnime';
 import SplashScreen from './src/screens/Splash';
 import DetailScreen from './src/screens/Detail';
@@ -23,7 +23,6 @@ const App = () => {
     return () => clearTimeout(splashTimeout);
   }, []);
 
-  // Custom Drawer content with logo
   const CustomDrawerContent = (props: DrawerContentComponentProps) => (
     <View style={styles.drawerContent}>
       <Image source={require('./src/asset/logo.png')} style={styles.logo} />
