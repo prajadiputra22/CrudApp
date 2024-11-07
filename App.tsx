@@ -1,86 +1,96 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, FlatList } from 'react-native';
-import axios from 'axios';
-import TodoForm from './src/components/todoForm';
-import TodoList from './src/components/todoList';
+import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View, Image, StyleSheet } from 'react-native';
+import HomeScreen from './src/screens/Home'; // Pastikan import sudah benar
+import AddAnime from './src/screens/AddAnime';
+import SplashScreen from './src/screens/Splash';
+import DetailScreen from './src/screens/Detail';
+import { DrawerItemList, DrawerContentComponentProps } from '@react-navigation/drawer';
 
-const API_URL = 'https://671f7dd1e7a5792f052e711f.mockapi.io/todoapp/user';
+const Drawer = createDrawerNavigator();
+const Stack = createNativeStackNavigator();
 
-interface Todo {
-  id: number;
-  name: string;
-  todo: string;
-  description: string;
-  date: Date;
-}
-
-const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
-
-  const fetchTodos = async () => {
-    try {
-      const response = await axios.get(API_URL);
-      const todosWithDate = response.data.map((todo: any) => ({
-        ...todo,
-        date: new Date(todo.date),
-      }));
-      setTodos(todosWithDate);
-    } catch (error) {
-      console.error('Error fetching todos:', error);
-    }
-  };
-
-  const addTodo = async (todo: { name: string; todo: string; description: string; date: Date }) => {
-    try {
-      const response = await axios.post(API_URL, {
-        ...todo,
-        date: todo.date.toISOString(),
-      });
-      setTodos((prev) => [...prev, { ...response.data, date: new Date(response.data.date) }]);
-    } catch (error) {
-      console.error('Error adding todo:', error);
-    }
-  };
-
-  const editTodo = async (id: number, updatedTodo: Partial<Todo>) => {
-    try {
-      const response = await axios.put(`${API_URL}/${id}`, {
-        ...updatedTodo,
-        date: updatedTodo.date ? updatedTodo.date.toISOString() : undefined,
-      });
-      setTodos((prev) =>
-        prev.map((todo) => (todo.id === id ? { ...todo, ...response.data } : todo))
-      );
-    } catch (error) {
-      console.error('Error editing todo:', error);
-    }
-  };
-
-  const deleteTodo = async (id: number) => {
-    try {
-      await axios.delete(`${API_URL}/${id}`);
-      setTodos((prev) => prev.filter((todo) => todo.id !== id));
-    } catch (error) {
-      console.error('Error deleting todo:', error);
-    }
-  };
+const App = () => {
+  const [isSplashVisible, setIsSplashVisible] = useState(true);
 
   useEffect(() => {
-    fetchTodos();
+    const splashTimeout = setTimeout(() => {
+      setIsSplashVisible(false);
+    }, 2500);
+
+    return () => clearTimeout(splashTimeout);
   }, []);
 
+  // Custom Drawer content with logo
+  const CustomDrawerContent = (props: DrawerContentComponentProps) => (
+    <View style={styles.drawerContent}>
+      <Image source={require('./src/asset/logo.png')} style={styles.logo} />
+      <DrawerItemList {...props} />
+    </View>
+  );
+
+  const DrawerNavigator = () => (
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={{
+        drawerStyle: {
+          backgroundColor: '#b291f5',
+        },
+        headerStyle: {
+          backgroundColor: '#b291f5',
+        },
+        headerTintColor: '#fff',
+        drawerActiveBackgroundColor: '#545b62',
+        drawerActiveTintColor: '#fff',
+      }}
+    >
+      <Drawer.Screen name="Home" component={HomeScreen} />
+      <Drawer.Screen name="Add Anime" component={AddAnime} />
+    </Drawer.Navigator>
+  );
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <TodoForm addTodo={addTodo} />
-      <FlatList
-        data={todos}
-        renderItem={({ item }) => (
-          <TodoList todo={item} deleteTodo={deleteTodo} editTodo={editTodo} />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-      />
-    </SafeAreaView>
+    <NavigationContainer>
+      {isSplashVisible ? (
+        <SplashScreen onFinish={() => setIsSplashVisible(false)} />
+      ) : (
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Main"
+            component={DrawerNavigator}
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen
+            name="Detail"
+            component={DetailScreen}
+            options={{
+              headerStyle: {
+                backgroundColor: '#b291f5',
+              },
+              headerTintColor: '#fff',
+            }}
+          />
+        </Stack.Navigator>
+      )}
+    </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  drawerContent: {
+    flex: 1,
+    backgroundColor: '#b291f5',
+    paddingTop: 30,
+  },
+  logo: {
+    width: 300,
+    height: 50,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+});
 
 export default App;
