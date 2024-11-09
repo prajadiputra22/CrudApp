@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
 
 const AddAnime = () => {
-  // Menyimpan data form
+
   const [judul, setJudul] = useState('');
   const [tahun, setTahun] = useState('');
   const [genre, setGenre] = useState('');
@@ -14,7 +14,6 @@ const AddAnime = () => {
   const [durasi, setDurasi] = useState('');
   const [studio, setStudio] = useState('');
 
-  // Mengirim data ke API
   const handleSubmit = async () => {
     try {
       const infoDasarResponse = await axios.post('https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar', {
@@ -25,7 +24,7 @@ const AddAnime = () => {
         status,
         image,
       });
-
+  
       const infoDasarId = infoDasarResponse.data.id;
       await axios.post('https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail', {
         id: infoDasarId,
@@ -33,8 +32,20 @@ const AddAnime = () => {
         durasi: parseInt(durasi, 10),
         studio,
       });
-
+  
       Alert.alert("Success", "Anime data added successfully!");
+  
+      // Reset form
+      setJudul('');
+      setTahun('');
+      setGenre('');
+      setSinopsis('');
+      setStatus('');
+      setImage('');
+      setJumlahEpisode('');
+      setDurasi('');
+      setStudio('');
+  
     } catch (error) {
       Alert.alert("Error", "Failed to add anime data.");
       console.error("Error posting data:", error);
@@ -42,78 +53,76 @@ const AddAnime = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Input Data Anime</Text>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Text style={styles.header}>Input Data Anime</Text>
 
-      <TextInput
-        placeholder="Judul"
-        value={judul}
-        onChangeText={setJudul}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Tahun"
-        value={tahun}
-        onChangeText={setTahun}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Genre"
-        value={genre}
-        onChangeText={setGenre}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Sinopsis"
-        value={sinopsis}
-        onChangeText={setSinopsis}
-        style={[styles.input, styles.multiLineInput]}
-        multiline
-        numberOfLines={4}
-      />
-      <TextInput
-        placeholder="Status"
-        value={status}
-        onChangeText={setStatus}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Image URL"
-        value={image}
-        onChangeText={setImage}
-        style={styles.input}
-      />
-
-      <TextInput
-        placeholder="Jumlah Episode"
-        value={jumlahEpisode}
-        onChangeText={setJumlahEpisode}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Durasi (menit)"
-        value={durasi}
-        onChangeText={setDurasi}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Studio"
-        value={studio}
-        onChangeText={setStudio}
-        style={styles.input}
-      />
-
-      <Button title="Submit Anime Data" onPress={handleSubmit} />
-    </ScrollView>
+        <TextInput
+          placeholder="Judul"
+          value={judul}
+          onChangeText={setJudul}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Tahun"
+          value={tahun}
+          onChangeText={setTahun}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Genre"
+          value={genre}
+          onChangeText={setGenre}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Status"
+          value={status}
+          onChangeText={setStatus}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Image URL"
+          value={image}
+          onChangeText={setImage}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Jumlah Episode"
+          value={jumlahEpisode}
+          onChangeText={setJumlahEpisode}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Durasi (menit)"
+          value={durasi}
+          onChangeText={setDurasi}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Studio"
+          value={studio}
+          onChangeText={setStudio}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Sinopsis"
+          value={sinopsis}
+          onChangeText={setSinopsis}
+          style={[styles.input, styles.multiLineInput]}
+          multiline
+          numberOfLines={4}
+        />
+        <Button title="Submit Anime Data" onPress={handleSubmit} />
+      </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#545b62',
     paddingHorizontal: 20,
     paddingVertical: 20,

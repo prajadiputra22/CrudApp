@@ -3,16 +3,16 @@ import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
 interface SplashScreenProps {
-  onFinish: () => void; // Mendeklarasikan prop onFinish
+  onFinish: () => void;
 }
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      onFinish(); // Memanggil onFinish setelah 2500ms
+      onFinish();
     }, 2500);
 
-    return () => clearTimeout(timer); // Membersihkan timer saat komponen dibongkar
+    return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (

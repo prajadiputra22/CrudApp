@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, RefreshControl } from 'react-native';
 import axios from 'axios';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -13,6 +13,7 @@ type RouteParams = {
     jumlah_episode: number;
     durasi: number;
     studio: string;
+    status: string;
     sinopsis: string;
   };
 };
@@ -20,16 +21,19 @@ type RouteParams = {
 type DetailScreenProps = NativeStackScreenProps<RouteParams, 'Detail'>;
 
 const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
-  const { id, judul, tahun, genre, image, jumlah_episode, durasi, studio, sinopsis } = route.params;
+  const { id, judul, tahun, genre, image, jumlah_episode, durasi, studio, status, sinopsis } = route.params;
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedJudul, setEditedJudul] = useState(judul);
   const [editedTahun, setEditedTahun] = useState(tahun.toString());
   const [editedGenre, setEditedGenre] = useState(genre);
+  const [editedImage, setEditedImage] = useState(image);
   const [editedJumlahEpisode, setEditedJumlahEpisode] = useState(jumlah_episode.toString());
   const [editedDurasi, setEditedDurasi] = useState(durasi.toString());
   const [editedStudio, setEditedStudio] = useState(studio);
+  const [editedStatus, setEditedStatus] = useState(status);
   const [editedSinopsis, setEditedSinopsis] = useState(sinopsis);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -41,10 +45,11 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
         judul: editedJudul,
         tahun: parseInt(editedTahun),
         genre: editedGenre,
-        image,
+        status: editedStatus,
+        image: editedImage,
         sinopsis: editedSinopsis,
       };
-
+  
       const updatedDetail = {
         jumlah_episode: parseInt(editedJumlahEpisode),
         durasi: parseInt(editedDurasi),
@@ -55,15 +60,27 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
         axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar/${id}`, updatedInfo),
         axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`, updatedDetail),
       ]);
-      
+  
       Alert.alert('Success', 'Data updated successfully');
       setIsEditing(false);
+
+      navigation.setParams({
+        judul: editedJudul,
+        tahun: parseInt(editedTahun),
+        genre: editedGenre,
+        image: editedImage,
+        jumlah_episode: parseInt(editedJumlahEpisode),
+        durasi: parseInt(editedDurasi),
+        studio: editedStudio,
+        status: editedStatus,
+        sinopsis: editedSinopsis,
+      });
     } catch (error) {
       console.log(error);
       Alert.alert('Error', 'Failed to update data');
     }
   };
-
+  
   const handleDelete = async () => {
     try {
       await Promise.all([
@@ -79,12 +96,21 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
     }
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  }, []);
+
   return (
-    <ScrollView style={styles.container}>
-      <Image source={{ uri: image }} style={styles.image} />
+    <ScrollView 
+      style={styles.container} 
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <Image source={{ uri: editedImage }} style={styles.image} />
       <Text style={styles.title}>{judul}</Text>
 
-      {/* Informasi Detail */}
       <View style={styles.infoRow}>
         <Text style={styles.label}>Genre</Text>
         <Text style={styles.separator}>:</Text>
@@ -116,6 +142,12 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
       </View>
 
       <View style={styles.infoRow}>
+        <Text style={styles.label}>Status</Text>
+        <Text style={styles.separator}>:</Text>
+        <Text style={styles.value}>{status}</Text>
+      </View>
+
+      <View style={styles.infoRow}>
         <Text style={styles.label}>Sinopsis</Text>
         <Text style={styles.separator}>:</Text>
       </View>
@@ -123,13 +155,15 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
 
       {isEditing ? (
         <>
-          <TextInput style={styles.input} value={editedJudul} onChangeText={setEditedJudul} placeholder="Edit Judul" />
-          <TextInput style={styles.input} value={editedTahun} onChangeText={setEditedTahun} placeholder="Edit Tahun" keyboardType="numeric" />
-          <TextInput style={styles.input} value={editedGenre} onChangeText={setEditedGenre} placeholder="Edit Genre" />
-          <TextInput style={styles.input} value={editedJumlahEpisode} onChangeText={setEditedJumlahEpisode} placeholder="Edit Jumlah Episode" keyboardType="numeric" />
-          <TextInput style={styles.input} value={editedDurasi} onChangeText={setEditedDurasi} placeholder="Edit Durasi" keyboardType="numeric" />
-          <TextInput style={styles.input} value={editedStudio} onChangeText={setEditedStudio} placeholder="Edit Studio" />
-          <TextInput style={styles.input} value={editedSinopsis} onChangeText={setEditedSinopsis} placeholder="Edit Sinopsis" multiline />
+          <TextInput style={styles.input} value={editedJudul} onChangeText={setEditedJudul} placeholder="Judul" />
+          <TextInput style={styles.input} value={editedTahun} onChangeText={setEditedTahun} placeholder="Tahun" keyboardType="numeric" />
+          <TextInput style={styles.input} value={editedGenre} onChangeText={setEditedGenre} placeholder="Genre" />
+          <TextInput style={styles.input} value={editedImage} onChangeText={setEditedImage} placeholder="Image URL" />
+          <TextInput style={styles.input} value={editedJumlahEpisode} onChangeText={setEditedJumlahEpisode} placeholder="Jumlah Episode" keyboardType="numeric" />
+          <TextInput style={styles.input} value={editedDurasi} onChangeText={setEditedDurasi} placeholder="Durasi" keyboardType="numeric" />
+          <TextInput style={styles.input} value={editedStudio} onChangeText={setEditedStudio} placeholder="Studio" />
+          <TextInput style={styles.input} value={editedStatus} onChangeText={setEditedStatus} placeholder="Status" />
+          <TextInput style={styles.input} value={editedSinopsis} onChangeText={setEditedSinopsis} placeholder="Sinopsis" multiline />
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
@@ -159,24 +193,24 @@ const styles = StyleSheet.create({
     height: 300, 
     resizeMode: 'contain', 
     borderRadius: 10, 
-    marginBottom: 16 
+    marginBottom: 10 
   },
   title: { 
-    fontSize: 24, 
+    fontSize: 25, 
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 8 
+    marginBottom: 10,
+    textAlign:'center'
   },
   infoRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 8 
+    flexDirection: 'row',
+    marginBottom: 5 
   },
   label: { 
     fontSize: 16, 
     fontWeight: 'bold', 
     color: 'white', 
-    width: 80
+    width: 70,
   },
   separator: {
     fontSize: 16,
@@ -185,8 +219,8 @@ const styles = StyleSheet.create({
   },
   value: { 
     fontSize: 16, 
-    color: 'white', 
-    flex: 1 
+    color: 'white',
+    flex: 1
   },
   valueSinopsis: { 
     fontSize: 16, 
