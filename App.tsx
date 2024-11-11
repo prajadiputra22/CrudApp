@@ -11,5 +11,3 @@ const App = () => {
 };
 
 export default App;
-// const sortedData = combinedData.sort((a: Anime, b: Anime) => a.judul.localeCompare(b.judul));
-// setAnimeList(sortedData);
