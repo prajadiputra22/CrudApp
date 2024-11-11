@@ -14,7 +14,7 @@ interface InfoDasar {
 
 interface Detail {
   id: string;
-  jumlah_episode: number;
+  jumlah_episode: number|string;
   durasi: number;
   studio: string;
 }
@@ -41,13 +41,13 @@ const Home: React.FC<HomeScreenProps> = ({ navigation }) => {
         const detail = detailData.find(d => d.id === info.id);
         return { 
           ...info, 
-          jumlah_episode: detail?.jumlah_episode ?? 0,
+          jumlah_episode: detail?.jumlah_episode ?? 'Unknown',
           durasi: detail?.durasi ?? 0,
           studio: detail?.studio ?? 'Unknown',
         };
       });
 
-      const sortedData = combinedData.sort((a, b) => a.judul.localeCompare(b.judul));
+      const sortedData = combinedData.sort((a, b) => a.id.localeCompare(b.id));
       setData(sortedData);
     } catch (e) {
       console.log('Error fetching data:', e);

@@ -1,29 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, RefreshControl } from 'react-native';
 import axios from 'axios';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { DrawerScreenProps } from '@react-navigation/drawer';
 
-type RouteParams = {
-  Detail: {
-    id: string;
-    judul: string;
-    tahun: number;
-    genre: string;
-    image: string;
-    jumlah_episode: number;
-    durasi: number;
-    studio: string;
-    status: string;
-    sinopsis: string;
-  };
-};
-
-type DetailScreenProps = NativeStackScreenProps<RouteParams, 'Detail'>;
+type DetailScreenProps = DrawerScreenProps<any, 'Detail'>;
 
 const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
-  const { id, judul, tahun, genre, image, jumlah_episode, durasi, studio, status, sinopsis } = route.params;
+  const params = route.params as any;
+  const { id, judul, tahun, genre, image, jumlah_episode, durasi, studio, status, sinopsis } = params;
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [Editing, setEditing] = useState(false);
   const [editedJudul, setEditedJudul] = useState(judul);
   const [editedTahun, setEditedTahun] = useState(tahun.toString());
   const [editedGenre, setEditedGenre] = useState(genre);
@@ -36,7 +22,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
 
   const handleEdit = () => {
-    setIsEditing(true);
+    setEditing(true);
   };
 
   const handleSave = async () => {
@@ -56,13 +42,13 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
         studio: editedStudio,
       };
 
-      await Promise.all([
+      await Promise.all([ 
         axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar/${id}`, updatedInfo),
         axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`, updatedDetail),
       ]);
   
       Alert.alert('Success', 'Data updated successfully');
-      setIsEditing(false);
+      setEditing(false);
 
       navigation.setParams({
         judul: editedJudul,
@@ -80,7 +66,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
       Alert.alert('Error', 'Failed to update data');
     }
   };
-  
+
   const handleDelete = async () => {
     try {
       await Promise.all([
@@ -104,13 +90,10 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
   return (
     <ScrollView 
       style={styles.container} 
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <Image source={{ uri: editedImage }} style={styles.image} />
       <Text style={styles.title}>{judul}</Text>
-
       <View style={styles.infoRow}>
         <Text style={styles.label}>Genre</Text>
         <Text style={styles.separator}>:</Text>
@@ -153,7 +136,7 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
       </View>
       <Text style={styles.valueSinopsis}>{sinopsis}</Text>
 
-      {isEditing ? (
+      {Editing ? (
         <>
           <TextInput style={styles.input} value={editedJudul} onChangeText={setEditedJudul} placeholder="Judul" />
           <TextInput style={styles.input} value={editedTahun} onChangeText={setEditedTahun} placeholder="Tahun" keyboardType="numeric" />
