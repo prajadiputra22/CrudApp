@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddAnime = () => {
-
   const [judul, setJudul] = useState('');
   const [tahun, setTahun] = useState('');
   const [genre, setGenre] = useState('');
@@ -13,9 +13,26 @@ const AddAnime = () => {
   const [jumlahEpisode, setJumlahEpisode] = useState('');
   const [durasi, setDurasi] = useState('');
   const [studio, setStudio] = useState('');
+  const [tautan, setTautan] = useState('');
+
+  const saveLinkToStorage = async (id: string, link: string) => {
+    try {
+      const savedLinksJson = await AsyncStorage.getItem('savedLinks');
+      const savedLinks = savedLinksJson ? JSON.parse(savedLinksJson) : {};
+      savedLinks[id] = link;
+      await AsyncStorage.setItem('savedLinks', JSON.stringify(savedLinks));
+    } catch (error) {
+      console.error('Error saving link:', error);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
+      if (!judul || !tahun || !genre || !status || !image || !jumlahEpisode || !durasi || !studio) {
+        Alert.alert("Error", "Please fill in all required fields.");
+        return;
+      }
+
       const infoDasarResponse = await axios.post('https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar', {
         judul,
         tahun: parseInt(tahun, 10),
@@ -26,16 +43,21 @@ const AddAnime = () => {
       });
   
       const infoDasarId = infoDasarResponse.data.id;
+
       await axios.post('https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail', {
         id: infoDasarId,
         jumlah_episode: parseInt(jumlahEpisode, 10),
         durasi: parseInt(durasi, 10),
         studio,
+        tautan: tautan.trim(),
       });
+
+      if (tautan) {
+        await saveLinkToStorage(infoDasarId, tautan);
+      }
   
       Alert.alert("Success", "Anime data added successfully!");
   
-      // Reset form
       setJudul('');
       setTahun('');
       setGenre('');
@@ -45,7 +67,8 @@ const AddAnime = () => {
       setJumlahEpisode('');
       setDurasi('');
       setStudio('');
-  
+      setTautan('');
+
     } catch (error) {
       Alert.alert("Error", "Failed to add anime data.");
       console.error("Error posting data:", error);
@@ -105,6 +128,12 @@ const AddAnime = () => {
           placeholder="Studio"
           value={studio}
           onChangeText={setStudio}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="tautan"
+          value={tautan}
+          onChangeText={setTautan}
           style={styles.input}
         />
         <TextInput

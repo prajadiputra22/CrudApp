@@ -20,7 +20,7 @@ function BottomTabNavigator() {
       }}
     >
       <Tab.Screen
-        name="Home"
+        name="Main"
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',

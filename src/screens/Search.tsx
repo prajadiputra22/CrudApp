@@ -15,6 +15,7 @@ type Anime = {
   jumlah_episode: number | string;
   durasi: number;
   studio: string;
+  tautan: string;
 };
 
 const SearchScreen: React.FC = () => {
@@ -41,6 +42,7 @@ const SearchScreen: React.FC = () => {
             jumlah_episode: detail?.jumlah_episode ?? 'Unknown',
             durasi: detail?.durasi ?? 0,
             studio: detail?.studio ?? 'Unknown',
+            string: detail?.tautan ?? 'Unknown'
           };
         });
 

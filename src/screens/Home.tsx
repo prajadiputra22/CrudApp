@@ -17,6 +17,7 @@ interface Detail {
   jumlah_episode: number|string;
   durasi: number;
   studio: string;
+  link?: string;
 }
 
 interface CombinedData extends InfoDasar, Detail {}
@@ -44,6 +45,7 @@ const Home: React.FC<HomeScreenProps> = ({ navigation }) => {
           jumlah_episode: detail?.jumlah_episode ?? 'Unknown',
           durasi: detail?.durasi ?? 0,
           studio: detail?.studio ?? 'Unknown',
+          link: detail?.link ?? 'Unknown'
         };
       });
 
