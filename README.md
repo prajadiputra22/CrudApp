@@ -1,4 +1,4 @@
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/splash.jpg?raw=true)
+![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/splash.jpg?raw=180x90)
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/home.jpg?raw=true)
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/search.jpg?raw=true)
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/detail.jpg?raw=true)
