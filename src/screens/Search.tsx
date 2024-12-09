@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, TextInput, FlatList, Text, StyleSheet, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,6 +22,8 @@ const SearchScreen: React.FC = () => {
   const [searchText, setSearchText] = useState<string>('');
   const [animeList, setAnimeList] = useState<Anime[]>([]);
   const [filteredAnime, setFilteredAnime] = useState<Anime[]>([]);
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height; // Deteksi orientasi
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   useEffect(() => {
@@ -42,14 +44,13 @@ const SearchScreen: React.FC = () => {
             jumlah_episode: detail?.jumlah_episode ?? 'Unknown',
             durasi: detail?.durasi ?? 0,
             studio: detail?.studio ?? 'Unknown',
-            string: detail?.tautan ?? 'Unknown'
+            tautan: detail?.tautan ?? 'Unknown',
           };
         });
 
         const sortedData = combinedData.sort((a: Anime, b: Anime) => a.judul.localeCompare(b.judul));
         setAnimeList(sortedData);
-        setAnimeList(combinedData);
-        setFilteredAnime(combinedData);
+        setFilteredAnime(sortedData);
       } catch (error) {
         console.log(error);
       }
@@ -72,7 +73,7 @@ const SearchScreen: React.FC = () => {
 
   const renderItem = ({ item }: { item: Anime }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { maxWidth: isLandscape ? '48%' : '100%' }]} // Responsif
       onPress={() => handleItemPress(item)}
     >
       <Image source={{ uri: item.image }} style={styles.image} />
@@ -94,9 +95,13 @@ const SearchScreen: React.FC = () => {
       />
       <FlatList
         data={filteredAnime}
+        key={isLandscape ? 'h' : 'v'} // Kunci dinamis untuk orientasi
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
+        numColumns={isLandscape ? 2 : 1} // Responsif jumlah kolom
+        columnWrapperStyle={isLandscape ? styles.row : undefined}
+        extraData={isLandscape} // Paksa re-render saat orientasi berubah
       />
     </View>
   );
@@ -121,11 +126,13 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   card: {
+    flex: 1,
     flexDirection: 'row',
     backgroundColor: '#333',
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
+    marginHorizontal: 5, // Jarak antar item di landscape
     alignItems: 'center',
   },
   image: {
@@ -145,6 +152,9 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#ccc',
+  },
+  row: {
+    justifyContent: 'space-between',
   },
 });
 

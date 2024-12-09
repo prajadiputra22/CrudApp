@@ -100,7 +100,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
         axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`, updatedDetail),
       ]);
 
-      // Save link to AsyncStorage when updating
       await saveLinkToStorage(editedTautan);
 
       Alert.alert('Success', 'Data updated successfully');
@@ -119,7 +118,6 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
         axios.delete(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`),
       ]);
 
-      // Remove link from AsyncStorage when deleting
       const updatedLinks = { ...savedLinks };
       delete updatedLinks[id];
       await AsyncStorage.setItem('savedLinks', JSON.stringify(updatedLinks));
