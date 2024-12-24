@@ -1,8 +1,10 @@
 [**Animasi**]
+______________
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/animasi.jpg?raw=true)
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/animasi2.jpg?raw=true)
 _____________________________________________________________________________________________________
 [**SQLite**]
+______________
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/sqlite1.jpg?raw=true)
 ![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/sqlite2.jpg?raw=true)
 
