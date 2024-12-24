@@ -1,10 +1,10 @@
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/splash.jpg?raw=true)
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/home.jpg?raw=true)
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/search.jpg?raw=true)
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/detail.jpg?raw=true)
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/edit.jpg?raw=true)
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/drawer.jpg?raw=true)
-![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/addanime.jpg?raw=true)
+**Animasi**
+![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/animasi.jpg?raw=true)
+![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/animasi2.jpg?raw=true)
+
+**SQLite**
+![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/sqlite1.jpg?raw=true)
+![alt text](https://github.com/prajadiputra22/CrudApp/blob/main/src/.result/sqlite2.jpg?raw=true)
 
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
