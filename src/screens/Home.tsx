@@ -1,26 +1,8 @@
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity, RefreshControl, Dimensions } from "react-native";
-import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { DrawerScreenProps } from "@react-navigation/drawer";
-
-interface InfoDasar {
-  id: string;
-  judul: string;
-  tahun: number;
-  genre: string;
-  sinopsis: string;
-  image: string;
-}
-
-interface Detail {
-  id: string;
-  jumlah_episode: number | string;
-  durasi: number;
-  studio: string;
-  link?: string;
-}
-
-interface CombinedData extends InfoDasar, Detail {}
+import { initDatabase, getAnimeFromDatabase, insertAnime, CombinedData } from '../database/database';
 
 type HomeScreenProps = DrawerScreenProps<any, "Home">;
 
@@ -29,13 +11,13 @@ const Home: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
 
-  // Function to detect orientation
   const detectOrientation = () => {
     const { width, height } = Dimensions.get("window");
     setIsLandscape(width > height);
   };
 
   useEffect(() => {
+    initDatabase();
     fetch();
     detectOrientation();
 
@@ -45,36 +27,46 @@ const Home: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   const fetch = async () => {
     try {
-      const [infoDasarResponse, detailResponse] = await Promise.all([
-        axios.get(
-          "https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar"
-        ),
-        axios.get(
-          "https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail"
-        ),
-      ]);
+      const localData = await getAnimeFromDatabase();
+      
+      if (localData.length > 0) {
+        setData(localData);
+      } else {
+        const [infoDasarResponse, detailResponse] = await Promise.all([
+          axios.get<Omit<CombinedData, 'jumlah_episode' | 'durasi' | 'studio' | 'link'>[]>(
+            "https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar"
+          ),
+          axios.get<Pick<CombinedData, 'id' | 'jumlah_episode' | 'durasi' | 'studio' | 'link'>[]>(
+            "https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail"
+          ),
+        ]);
 
-      const infoDasarData: InfoDasar[] = infoDasarResponse.data;
-      const detailData: Detail[] = detailResponse.data;
+        const infoDasarData = infoDasarResponse.data;
+        const detailData = detailResponse.data;
 
-      const combinedData: CombinedData[] = infoDasarData.map((info) => {
-        const detail = detailData.find((d) => d.id === info.id);
-        return {
-          ...info,
-          jumlah_episode: detail?.jumlah_episode ?? "Unknown",
-          durasi: detail?.durasi ?? 0,
-          studio: detail?.studio ?? "Unknown",
-          link: detail?.link ?? "Unknown",
-        };
-      });
+        const combinedData: CombinedData[] = infoDasarData.map((info) => {
+          const detail = detailData.find((d) => d.id === info.id);
+          return {
+            ...info,
+            jumlah_episode: detail?.jumlah_episode ?? "Unknown",
+            durasi: detail?.durasi ?? 0,
+            studio: detail?.studio ?? "Unknown",
+            link: detail?.link ?? "Unknown",
+          };
+        });
 
-      const sortedData = combinedData.sort((a, b) => a.id.localeCompare(b.id));
-      setData(sortedData);
+        for (const anime of combinedData) {
+          await insertAnime(anime);
+        }
+
+        const sortedData = combinedData.sort((a, b) => a.id.localeCompare(b.id));
+        setData(sortedData);
+      }
     } catch (e) {
       console.log("Error fetching data:", e);
     }
   };
-
+  
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetch().then(() => setRefreshing(false));
@@ -83,6 +75,7 @@ const Home: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <ScrollView
       style={styles.container}
+      contentContainerStyle={styles.scrollContent} 
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -117,6 +110,9 @@ const styles = StyleSheet.create({
   container: {
     padding: 5,
     backgroundColor: "#545b62",
+  },
+  scrollContent: {
+    paddingBottom: 30,
   },
   productList: {
     flexDirection: "row",
@@ -159,3 +155,4 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
+

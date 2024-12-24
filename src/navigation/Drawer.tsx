@@ -27,9 +27,10 @@ const DrawerNavigator = () => (
     }}
   >
     <Drawer.Screen 
-      name="Home" 
+      name="MainTabs" // Changed from "Home" to "MainTabs"
       component={BottomTabNavigator}
       options={{
+        title: "Home", // This will show "Home" in the drawer
         headerTitle: () => (
           <Image source={require('../asset/logo.png')} style={styles.headerLogo} />
         ),
@@ -60,3 +61,4 @@ const styles = StyleSheet.create({
 });
 
 export default DrawerNavigator;
+
