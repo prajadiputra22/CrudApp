@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from '../screens/Splash';
 import DetailScreen from '../screens/Detail';
 import DrawerNavigator from '../navigation/Drawer';
+import Login from '../screens/authentication/Login'
+import Register from '../screens/authentication/Register'
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +25,15 @@ const App = () => {
       {isSplashVisible ? (
         <SplashScreen onFinish={() => setIsSplashVisible(false)} />
       ) : (
-        <Stack.Navigator>
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Register" component={Register} />
           <Stack.Screen
             name="Main"
             component={DrawerNavigator}
