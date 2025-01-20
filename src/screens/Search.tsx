@@ -96,7 +96,6 @@ const SearchScreen: React.FC = () => {
     fetchAnime();
   }, []);
 
-  // Komponen untuk menampilkan status koneksi
   const NetworkStatus = () => (
     !isOnline ? (
       <View style={styles.offlineContainer}>
