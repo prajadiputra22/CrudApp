@@ -80,24 +80,27 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
   const handleSave = async () => {
     try {
       const updatedInfo = {
-        id,
         judul: editedJudul,
         tahun: parseInt(editedTahun),
         genre: editedGenre,
         status: editedStatus,
         image: editedImage,
         sinopsis: editedSinopsis,
+      };
+
+      const updatedDetail = {
         jumlah_episode: parseInt(editedJumlahEpisode),
         durasi: parseInt(editedDurasi),
         studio: editedStudio,
         tautan: editedTautan,
       };
-      // Update in API
+
       await Promise.all([ 
         axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar/${id}`, updatedInfo),
-        axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`, updatedInfo),
+        axios.put(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`, updatedDetail),
       ]);
 
+      // Save link to AsyncStorage when updating
       await saveLinkToStorage(editedTautan);
 
       Alert.alert('Success', 'Data updated successfully');
@@ -111,12 +114,12 @@ const DetailScreen: React.FC<DetailScreenProps> = ({ route, navigation }) => {
 
   const handleDelete = async () => {
     try {
-      // Delete from API
       await Promise.all([
         axios.delete(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/InfoDasar/${id}`),
         axios.delete(`https://671f7dd1e7a5792f052e711f.mockapi.io/infonime/Detail/${id}`),
       ]);
 
+      // Remove link from AsyncStorage when deleting
       const updatedLinks = { ...savedLinks };
       delete updatedLinks[id];
       await AsyncStorage.setItem('savedLinks', JSON.stringify(updatedLinks));
@@ -326,4 +329,3 @@ const styles = StyleSheet.create({
 });
 
 export default DetailScreen;
-

@@ -58,4 +58,3 @@ export const insertAnime = async (anime: CombinedData): Promise<void> => {
      anime.jumlah_episode, anime.durasi, anime.studio, anime.link]
   );
 };
-
